@@ -36,12 +36,11 @@ const TimeLogSchema = new Schema({
 });
 
 // Calculate hours worked before saving if clockOut is present
-TimeLogSchema.pre('save', function (next) {
+TimeLogSchema.pre('save', function () {
     if (this.clockIn && this.clockOut) {
         const diff = (this.clockOut.getTime() - this.clockIn.getTime()) / (1000 * 60 * 60);
         this.hoursWorked = Math.round(diff * 100) / 100;
     }
-    next();
 });
 
 export const TimeLog = models.TimeLog || model('TimeLog', TimeLogSchema);
