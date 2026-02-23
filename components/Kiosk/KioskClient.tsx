@@ -69,6 +69,12 @@ export default function KioskClient() {
     setTimeout(() => setStatus({ type: null, message: '' }), 5000);
   };
 
+  const handleExit = () => {
+    localStorage.removeItem('user');
+    sessionStorage.clear();
+    window.location.href = '/';
+  };
+
   return (
     <main className="kiosk-container gradient-bg">
       <div className="kiosk-content">
@@ -128,7 +134,7 @@ export default function KioskClient() {
               <LogOut size={32} />
               <span>CLOCK OUT</span>
             </button>
-            <button onClick={() => window.location.href = '/'} className="action-button logout-kiosk">
+            <button onClick={handleExit} className="action-button logout-kiosk">
               <LogOut size={24} />
               <span>EXIT DEVICE</span>
             </button>

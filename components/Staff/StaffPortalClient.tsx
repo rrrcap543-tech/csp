@@ -41,6 +41,12 @@ export default function StaffPortalClient() {
     const activeShift = logs.find(log => log.status === 'active');
     const weeklyHours = logs.reduce((acc, log) => acc + (log.hoursWorked || 0), 0).toFixed(1);
 
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        sessionStorage.clear();
+        router.push('/');
+    };
+
     return (
         <main className="staff-container gradient-bg">
             <div className="staff-content">
@@ -53,8 +59,9 @@ export default function StaffPortalClient() {
                             <p>Northampton UK Branch • {format(new Date(), 'EEEE, MMM do')}</p>
                         </div>
                     </div>
-                    <button className="icon-btn logout" onClick={() => router.push('/')}>
-                        <LogOut size={22} />
+                    <button className="logout-action-btn" onClick={handleLogout} aria-label="Log out">
+                        <LogOut size={20} />
+                        <span className="logout-text">Log out</span>
                     </button>
                 </header>
 
@@ -153,7 +160,10 @@ export default function StaffPortalClient() {
         .avatar { width: 60px; height: 60px; border-radius: 1.5rem; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: 800; border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .user-text h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.25rem; letter-spacing: -0.5px; }
         .user-text p { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
-        .logout { color: var(--text-muted); background: white; border: 1px solid var(--border); padding: 0.75rem; border-radius: 1rem; }
+        
+        .logout-action-btn { display: flex; align-items: center; gap: 0.5rem; color: var(--destructive); background: #fef2f2; padding: 0.6rem 1rem; border-radius: 1rem; font-weight: 700; transition: all 0.2s; border: 1px solid transparent; }
+        .logout-action-btn:hover { background: #fee2e2; border-color: #fecaca; }
+        .logout-text { font-size: 0.9rem; }
 
         .status-card { padding: 2rem; border-radius: 2.25rem; display: flex; justify-content: space-between; align-items: center; background: white; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         .status-card.active { border-color: #bbf7d0; background: #f0fdf4; }
@@ -203,6 +213,8 @@ export default function StaffPortalClient() {
         @media (max-width: 640px) {
           .staff-container { padding: 1.5rem 1rem; }
           .staff-header h1 { font-size: 1.5rem; }
+          .logout-text { display: none; }
+          .logout-action-btn { padding: 0.75rem; }
           .status-card { flex-direction: column; gap: 1.5rem; text-align: center; padding: 1.5rem; }
           .status-info { flex-direction: column; }
           .clock-off-quick { width: 100%; border-radius: 1.25rem; }
