@@ -39,7 +39,7 @@ export default function AdminSidebar() {
       <div className="sidebar-footer">
         <button className="nav-item logout">
           <LogOut size={20} />
-          <span>Logout</span>
+          <span>Log out</span>
         </button>
       </div>
 
