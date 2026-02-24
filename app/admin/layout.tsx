@@ -39,7 +39,7 @@ export default function AdminLayout({
         @media (max-width: 768px) {
           .admin-layout {
             padding-top: 60px; /* Space for mobile header */
-            padding-bottom: 70px; /* Space for mobile nav */
+            padding-bottom: 72px; /* Space for mobile nav */
           }
           .admin-main {
             margin-left: 0;

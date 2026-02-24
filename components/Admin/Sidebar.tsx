@@ -185,20 +185,19 @@ export default function AdminSidebar() {
         @media (max-width: 768px) {
           .mobile-admin-header {
             display: flex;
+            padding: 0 1.25rem;
+            height: 64px;
           }
           .admin-sidebar {
             width: 100%;
-            height: 70px;
+            height: 72px;
             flex-direction: row;
             top: auto;
             bottom: 0;
-            padding: 0 1rem;
-            border-right: none;
+            padding: 0;
+            background: white;
             border-top: 1px solid var(--border);
-            justify-content: space-around;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
+            justify-content: center;
           }
           .sidebar-header, .sidebar-footer {
             display: none;
@@ -206,28 +205,48 @@ export default function AdminSidebar() {
           .sidebar-nav {
             flex-direction: row;
             width: 100%;
-            justify-content: space-around;
+            height: 100%;
+            justify-content: space-evenly;
             gap: 0;
+            padding: 0 0.5rem;
           }
           .nav-item {
+            flex: 1;
             flex-direction: column;
-            gap: 0.25rem;
-            padding: 0.5rem;
-            font-size: 0.7rem;
+            gap: 0.35rem;
+            padding: 0.75rem 0;
+            font-size: 0.65rem;
             border-radius: 0;
             background: transparent !important;
             box-shadow: none !important;
             color: var(--text-muted);
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: color 0.3s ease;
           }
           .nav-item.active {
             color: var(--primary);
           }
+          .nav-item.active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 0 0 4px 4px;
+          }
           .nav-item span {
             display: block;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
           }
           .nav-item :global(svg) {
-            width: 22px;
-            height: 22px;
+            transform: translateY(2px);
           }
         }
       `}</style>

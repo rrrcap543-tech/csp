@@ -336,11 +336,11 @@ export default function EmployeesPage() {
           position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); display: flex; 
           align-items: center; justify-content: center; padding: 2rem; z-index: 1000;
         }
-        .modal-content { width: 100%; max-width: 500px; padding: 3rem; border-radius: 2.5rem; background: white; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); }
-        .modal-content h2 { margin-bottom: 2rem; font-weight: 800; font-size: 1.5rem; }
-        .form-group { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        label { font-size: 0.85rem; color: var(--text-muted); font-weight: 700; }
+        .modal-content { width: 100%; max-width: 650px; padding: 3rem; border-radius: 2.5rem; background: white; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); }
+        .modal-content h2 { margin-bottom: 2.25rem; font-weight: 800; font-size: 1.75rem; letter-spacing: -0.5px; }
+        .form-group { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.75rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.75rem; }
+        label { font-size: 0.85rem; color: var(--text-muted); font-weight: 700; margin-left: 0.25rem; }
         input, select { 
           background: #f8fafc; border: 1px solid var(--border); 
           padding: 1rem; border-radius: 1rem; color: var(--foreground); outline: none; font-family: inherit; font-size: 1rem;
