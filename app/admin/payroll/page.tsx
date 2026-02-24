@@ -185,6 +185,8 @@ export default function PayrollPage() {
           }
           .table-container {
             overflow-x: auto;
+            margin: 0 -1rem;
+            border-radius: 0;
           }
           th, td {
             white-space: nowrap;

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Monitor, Shield, User, Lock, ArrowRight, Pizza } from 'lucide-react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState<'kiosk' | 'admin' | 'staff'>('kiosk');
@@ -121,7 +122,7 @@ export default function LoginPage() {
               <input type="checkbox" id="remember" />
               <label htmlFor="remember">Keep me logged in</label>
             </div>
-            <a href="#" className="forgot-link">Forgot?</a>
+            <Link href="/auth/forgot-password" title="Reset your password" className="forgot-link">Forgot?</Link>
           </div>
 
           <button type="submit" className="submit-btn" disabled={loading}>
@@ -334,7 +335,7 @@ export default function LoginPage() {
 
         @media (max-width: 480px) {
           .login-card {
-            padding: 2.5rem 1.5rem;
+            padding: 2rem 1.25rem;
             border-radius: 2rem;
           }
           .login-header h1 {

@@ -354,12 +354,10 @@ export default function KioskClient() {
            .kiosk-container { padding: 1rem; }
            .kiosk-header { flex-direction: column; gap: 1.5rem; text-align: center; }
            .logo-text { font-size: 2rem; }
-           .clock-display { width: 100%; justify-content: center; }
-           
-           .pin-dot { width: 45px; height: 55px; font-size: 1.5rem; }
-          .interaction-grid {
-            grid-template-columns: 1fr;
-          }
+          .clock-display { width: 100%; justify-content: center; padding: 1rem; }
+          .time { font-size: 1.5rem; }
+          .icon-gold { width: 32px; height: 32px; }
+          .interaction-grid { grid-template-columns: 1fr; }
           .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;

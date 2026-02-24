@@ -9,6 +9,8 @@ const EmployeeSchema = new Schema({
     password: { type: String }, // Optional until invite accepted
     inviteToken: { type: String, sparse: true, unique: true },
     inviteStatus: { type: String, enum: ['pending', 'accepted'], default: 'pending' },
+    resetPasswordToken: { type: String, sparse: true, unique: true },
+    resetPasswordExpires: { type: Date },
     storeId: { type: String, default: 'northampton-uk' },
     createdAt: { type: Date, default: Date.now },
 });

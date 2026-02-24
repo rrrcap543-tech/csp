@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import { Employee } from '@/lib/models/models';
+import { sendInviteEmail } from '@/lib/mail';
 
 export async function GET() {
     try {
@@ -39,12 +40,19 @@ export async function POST(req: Request) {
 
         await newEmployee.save();
 
-        // Return info including the invite link (in reality, you'd send an email here)
-        return NextResponse.json({
+        if (!isKiosk && newEmployee.email && inviteToken) {
+            await sendInviteEmail(newEmployee.email, newEmployee.name, inviteToken);
+        }
+
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const responseData = {
             ...newEmployee.toObject(),
-            inviteUrl: isKiosk ? null : `${process.env.NEXTAUTH_URL}/accept-invite/${inviteToken}`
-        });
+            inviteUrl: isKiosk ? null : `${baseUrl}/accept-invite/${inviteToken}`
+        };
+
+        return NextResponse.json(responseData);
     } catch (error) {
+        console.error('Create employee error:', error);
         return NextResponse.json({ error: 'Failed to create employee' }, { status: 500 });
     }
 }

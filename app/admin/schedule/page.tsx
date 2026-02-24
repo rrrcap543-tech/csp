@@ -391,7 +391,18 @@ export default function AdminSchedule() {
         @media (max-width: 1280px) {
             .grid-corner { width: 150px; }
             .emp-sidebar { width: 150px; }
-            .schedule-grid { grid-template-columns: 150px repeat(7, 120px); overflow-x: auto; }
+            .schedule-grid { grid-template-columns: 150px repeat(7, 120px); }
+            .schedule-container { overflow-x: auto; margin: 0 -1rem; border-radius: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .header-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .header-actions button { padding: 0.75rem 0.5rem; font-size: 0.8rem; justify-content: center; }
+            .calendar-controls { flex-direction: column; gap: 1rem; padding: 1.25rem 1rem; }
+            .week-nav { width: 100%; justify-content: space-between; gap: 0.5rem; }
+            .current-week { font-size: 0.95rem; }
+            .modal-content { width: 95%; max-width: 450px; padding: 1.5rem; border-radius: 2rem; }
         }
       `}</style>
         </div>

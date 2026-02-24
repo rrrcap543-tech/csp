@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit2, Trash2, Shield, User, Monitor, Copy, Check, X } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Shield, User, Monitor, Copy, Check, X, Mail } from 'lucide-react';
 
 export default function EmployeesPage() {
     const [employees, setEmployees] = useState<any[]>([]);
@@ -64,6 +64,24 @@ export default function EmployeesPage() {
                 fetchEmployees();
             } else {
                 alert(data.error || 'Failed to create');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleResend = async (id: string) => {
+        try {
+            const res = await fetch('/api/employees/resend-invite', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            if (res.ok) {
+                alert('Invitation sent to employee');
+            } else {
+                const data = await res.json();
+                alert(data.error || 'Failed to resend');
             }
         } catch (err) {
             console.error(err);
@@ -140,6 +158,11 @@ export default function EmployeesPage() {
                                 </td>
                                 <td>
                                     <div className="actions">
+                                        {emp.inviteStatus === 'pending' && (
+                                            <button className="icon-btn resend" title="Resend Invitation Email" onClick={() => handleResend(emp._id)}>
+                                                <Mail size={18} />
+                                            </button>
+                                        )}
                                         <button className="icon-btn edit"><Edit2 size={18} /></button>
                                         <button className="icon-btn delete" onClick={() => handleDelete(emp._id)}><Trash2 size={18} /></button>
                                     </div>
@@ -157,7 +180,7 @@ export default function EmployeesPage() {
                             <div className="invite-success">
                                 <div className="success-icon"><Check size={32} /></div>
                                 <h2>Account Created!</h2>
-                                <p>Staff members must set their own password. Please copy and send this invitation link to <strong>{employees.find(e => e.inviteToken)?.name || 'the employee'}</strong>:</p>
+                                <p>An invitation email has been sent to the staff member. Staff members must set their own password. You can also manually copy and send this invitation link:</p>
 
                                 <div className="invite-link-box">
                                     <code>{inviteUrl}</code>
@@ -306,6 +329,7 @@ export default function EmployeesPage() {
           border-radius: 10px; background: #f8fafc; color: var(--text-muted); border: 1px solid var(--border);
         }
         .icon-btn:hover { color: var(--foreground); background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .icon-btn.resend:hover { border-color: #dcfce7; color: #16a34a; }
         .icon-btn.delete:hover { border-color: #fecaca; color: #ef4444; }
 
         .modal-overlay { 
@@ -330,17 +354,28 @@ export default function EmployeesPage() {
         .invite-success { text-align: center; }
         .success-icon { width: 64px; height: 64px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; }
         .invite-link-box { background: #f1f5f9; padding: 1rem; border-radius: 1rem; display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
-        .invite-link-box code { flex: 1; overflow: hidden; text-overflow: ellipsis; font-size: 0.85rem; color: #1e293b; }
+        .invite-link-box code { 
+          flex: 1; 
+          overflow: hidden; 
+          text-overflow: ellipsis; 
+          white-space: nowrap;
+          font-size: 0.85rem; 
+          color: #1e293b; 
+        }
         .copy-btn { padding: 0.5rem; background: white; border-radius: 0.5rem; color: var(--text-muted); border: 1px solid var(--border); }
         .done-btn { width: 100%; background: #0f172a; color: white; padding: 1rem; border-radius: 1rem; font-weight: 700; }
 
         @media (max-width: 768px) {
           .page-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
           .add-btn { width: 100%; justify-content: center; }
-          .table-container { overflow-x: auto; }
+          .table-container { 
+            overflow-x: auto; 
+            margin: 0 -1rem; 
+            border-radius: 0; 
+          }
           th, td { padding: 1rem; white-space: nowrap; }
-          .modal-content { padding: 2rem 1.5rem; }
-          .form-row { grid-template-columns: 1fr; }
+          .modal-content { padding: 2rem 1.25rem; border-radius: 2rem; }
+          .form-row { grid-template-columns: 1fr; gap: 0; }
         }
       `}</style>
         </div>
