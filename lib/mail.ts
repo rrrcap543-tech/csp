@@ -10,7 +10,8 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+const rawBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+const baseUrl = rawBaseUrl.endsWith('/') ? rawBaseUrl.slice(0, -1) : rawBaseUrl;
 
 export async function sendMail({ to, subject, html }: { to: string; subject: string; html: string }) {
     try {

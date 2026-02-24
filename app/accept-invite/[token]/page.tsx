@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Lock, CheckCircle, ShieldCheck, Pizza, ArrowRight, Loader2 } from 'lucide-react';
 
-export default function AcceptInvitePage() {
+function AcceptInviteForm() {
     const params = useParams();
     const router = useRouter();
     const token = params?.token as string;
@@ -20,6 +20,9 @@ export default function AcceptInvitePage() {
     useEffect(() => {
         if (token) {
             validateToken();
+        } else {
+            setLoading(false);
+            setError('Invitation link is missing a token.');
         }
     }, [token]);
 
@@ -30,7 +33,7 @@ export default function AcceptInvitePage() {
             if (res.ok) {
                 setUserData(data);
             } else {
-                setError(data.error);
+                setError(data.error || 'Invalid or expired invitation token');
             }
         } catch (err) {
             setError('Could not connect to the server');
@@ -66,7 +69,7 @@ export default function AcceptInvitePage() {
                 setTimeout(() => router.push('/'), 3000);
             } else {
                 const data = await res.json();
-                setError(data.error);
+                setError(data.error || 'Failed to activate account');
             }
         } catch (err) {
             setError('Failed to activate account');
@@ -218,5 +221,23 @@ export default function AcceptInvitePage() {
                 .animate-spin { animation: spin 1s linear infinite; }
             `}</style>
         </div>
+    );
+}
+
+export default function AcceptInvitePage() {
+    return (
+        <Suspense fallback={
+            <div className="invite-container gradient-bg">
+                <Loader2 className="animate-spin text-primary" size={48} />
+                <style jsx>{`
+                    .invite-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+                    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+                    .animate-spin { animation: spin 1s linear infinite; }
+                    .text-primary { color: var(--primary); }
+                `}</style>
+            </div>
+        }>
+            <AcceptInviteForm />
+        </Suspense>
     );
 }

@@ -9,8 +9,22 @@ export async function POST(req: Request) {
 
         let query: any = {};
         if (mode === 'kiosk') {
-            query = { username: identifier, role: 'kiosk' };
-        } else if (mode === 'admin') {
+            // Kiosk mode now only requires an Admin PIN (identifier)
+            const admin = await Employee.findOne({ employeeId: identifier, role: 'admin' });
+            if (!admin) {
+                return NextResponse.json({ error: 'Invalid Admin PIN' }, { status: 401 });
+            }
+            return NextResponse.json({
+                id: admin._id,
+                name: admin.name,
+                email: admin.email,
+                employeeId: admin.employeeId,
+                role: 'kiosk',
+                success: true
+            });
+        }
+
+        if (mode === 'admin') {
             query = { email: identifier, role: 'admin' };
         } else {
             query = { email: identifier, role: 'employee' };
@@ -26,6 +40,8 @@ export async function POST(req: Request) {
         return NextResponse.json({
             id: user._id,
             name: user.name,
+            email: user.email,
+            employeeId: user.employeeId,
             role: user.role,
             success: true
         });

@@ -9,7 +9,7 @@ export default function EmployeesPage() {
     const [showModal, setShowModal] = useState(false);
     const [inviteUrl, setInviteUrl] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
-    const [newEmp, setNewEmp] = useState({
+    const [newEmp, setNewEmp] = useState<any>({
         name: '',
         employeeId: '',
         email: '',
@@ -44,30 +44,45 @@ export default function EmployeesPage() {
         }
     };
 
-    const handleAdd = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const isEditing = !!newEmp._id;
         try {
             const res = await fetch('/api/employees', {
-                method: 'POST',
+                method: isEditing ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newEmp)
+                body: JSON.stringify(isEditing ? { ...newEmp, id: newEmp._id } : newEmp)
             });
             const data = await res.json();
 
             if (res.ok) {
-                if (data.inviteUrl) {
+                if (data.inviteUrl && !isEditing) {
                     setInviteUrl(data.inviteUrl);
                 } else {
                     setShowModal(false);
+                    setNewEmp({ name: '', employeeId: '', email: '', username: '', password: '', role: 'employee' });
                 }
-                setNewEmp({ name: '', employeeId: '', email: '', username: '', password: '', role: 'employee' });
                 fetchEmployees();
+                if (isEditing) {
+                    alert('Employee updated successfully');
+                }
             } else {
-                alert(data.error || 'Failed to create');
+                alert(data.error || 'Failed to save');
             }
         } catch (err) {
             console.error(err);
         }
+    };
+
+    const handleEdit = (emp: any) => {
+        setNewEmp({ ...emp });
+        setShowModal(true);
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+        setInviteUrl(null);
+        setNewEmp({ name: '', employeeId: '', email: '', username: '', password: '', role: 'employee' });
     };
 
     const handleResend = async (id: string) => {
@@ -103,7 +118,7 @@ export default function EmployeesPage() {
                     <h1>Staff & System Access</h1>
                     <p>Manage employees and store kiosk devices</p>
                 </div>
-                <button className="add-btn" onClick={() => setShowModal(true)}>
+                <button className="add-btn" onClick={() => { setNewEmp({ name: '', employeeId: '', email: '', username: '', password: '', role: 'employee' }); setShowModal(true); }}>
                     <Plus size={20} />
                     <span>Create Account</span>
                 </button>
@@ -163,7 +178,7 @@ export default function EmployeesPage() {
                                                 <Mail size={18} />
                                             </button>
                                         )}
-                                        <button className="icon-btn edit"><Edit2 size={18} /></button>
+                                        <button className="icon-btn edit" onClick={() => handleEdit(emp)}><Edit2 size={18} /></button>
                                         <button className="icon-btn delete" onClick={() => handleDelete(emp._id)}><Trash2 size={18} /></button>
                                     </div>
                                 </td>
@@ -189,15 +204,14 @@ export default function EmployeesPage() {
                                     </button>
                                 </div>
 
-                                <button className="done-btn" onClick={() => {
-                                    setInviteUrl(null);
-                                    setShowModal(false);
-                                }}>Done</button>
+                                <button className="done-btn" onClick={closeModal}>Done</button>
                             </div>
                         ) : (
                             <>
-                                <h2>{newEmp.role === 'kiosk' ? 'Create Kiosk Device' : 'Add New Employee'}</h2>
-                                <form onSubmit={handleAdd}>
+                                <h2>
+                                    {newEmp._id ? 'Edit Account' : (newEmp.role === 'kiosk' ? 'Create Kiosk Device' : 'Add New Employee')}
+                                </h2>
+                                <form onSubmit={handleSubmit}>
                                     <div className="form-group">
                                         <label>Display Name / Location</label>
                                         <input
@@ -268,8 +282,10 @@ export default function EmployeesPage() {
                                     )}
 
                                     <div className="modal-actions">
-                                        <button type="button" className="cancel-btn" onClick={() => setShowModal(false)}>Cancel</button>
-                                        <button type="submit" className="submit-btn">Save & Generate Invite</button>
+                                        <button type="button" className="cancel-btn" onClick={closeModal}>Cancel</button>
+                                        <button type="submit" className="submit-btn">
+                                            {newEmp._id ? 'Update Account' : 'Save & Generate Invite'}
+                                        </button>
                                     </div>
                                 </form>
                             </>

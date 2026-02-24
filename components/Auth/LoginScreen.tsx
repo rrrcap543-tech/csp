@@ -90,12 +90,14 @@ export default function LoginPage() {
 
         <form className="login-form" onSubmit={handleLogin}>
           <div className="input-group">
-            <label>{activeTab === 'kiosk' ? 'Kiosk Username' : 'Email Address'}</label>
+            <label>
+              {activeTab === 'kiosk' ? 'Admin Access PIN' : 'Email Address'}
+            </label>
             <div className="input-wrapper">
-              <User size={18} className="input-icon" />
+              {activeTab === 'kiosk' ? <Lock size={18} className="input-icon" /> : <User size={18} className="input-icon" />}
               <input
-                type={activeTab === 'kiosk' ? 'text' : 'email'}
-                placeholder={activeTab === 'kiosk' ? 'e.g. counter_kiosk_1' : 'admin@caprinos.co.uk'}
+                type={activeTab === 'kiosk' ? 'password' : 'email'}
+                placeholder={activeTab === 'kiosk' ? 'Enter Admin PIN' : 'admin@caprinos.co.uk'}
                 value={credentials.id}
                 onChange={(e) => setCredentials({ ...credentials, id: e.target.value })}
                 required
@@ -103,19 +105,21 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="input-group">
-            <label>Access PIN / Password</label>
-            <div className="input-wrapper">
-              <Lock size={18} className="input-icon" />
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={credentials.password}
-                onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-                required
-              />
+          {activeTab !== 'kiosk' && (
+            <div className="input-group">
+              <label>Password</label>
+              <div className="input-wrapper">
+                <Lock size={18} className="input-icon" />
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={credentials.password}
+                  onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                  required
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="form-actions">
             <div className="remember-me">

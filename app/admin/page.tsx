@@ -5,12 +5,68 @@ import { Users, Clock, Banknote, TrendingUp, MoreVertical } from 'lucide-react';
 
 export default function AdminDashboard() {
     const [data, setData] = React.useState<any>(null);
+    const [admin, setAdmin] = React.useState<any>(null);
+    const [isClockedIn, setIsClockedIn] = React.useState(false);
+    const [clocking, setClocking] = React.useState(false);
 
     React.useEffect(() => {
-        fetch('/api/stats')
-            .then(res => res.json())
-            .then(setData);
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const user = JSON.parse(storedUser);
+            setAdmin(user);
+            checkClockStatus(user.id);
+        }
+        fetchData();
     }, []);
+
+    const fetchData = async () => {
+        try {
+            const res = await fetch('/api/stats');
+            const d = await res.json();
+            setData(d);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const checkClockStatus = async (id: string) => {
+        try {
+            const res = await fetch(`/api/logs?employeeId=${id}`);
+            const logs = await res.json();
+            const active = logs.find((l: any) => l.status === 'active');
+            setIsClockedIn(!!active);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleClockAction = async () => {
+        if (!admin) return;
+        setClocking(true);
+        try {
+            const res = await fetch('/api/clock', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    employeeId: admin.employeeId, // Assuming employeeId is stored in user object
+                    email: admin.email,
+                    action: isClockedIn ? 'out' : 'in',
+                    location: { address: 'ADMIN_DASHBOARD' }
+                })
+            });
+            if (res.ok) {
+                setIsClockedIn(!isClockedIn);
+                fetchData();
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Clock failed');
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setClocking(false);
+        }
+    };
 
     const stats = [
         { title: 'Active Staff', value: data?.activeStaff || '0', icon: Clock, color: '#22c55e', trend: 'Live from store' },
@@ -24,8 +80,20 @@ export default function AdminDashboard() {
     return (
         <div className="dashboard-content">
             <header className="dashboard-header">
-                <h1>Dashboard Overview</h1>
-                <p>Welcome back, Admin. Here's what's happening today at Northampton.</p>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h1>Dashboard Overview</h1>
+                        <p>Welcome back, {admin?.name || 'Admin'}. Here's what's happening today at Northampton.</p>
+                    </div>
+                    <button
+                        className={`clock-btn ${isClockedIn ? 'out' : 'in'}`}
+                        onClick={handleClockAction}
+                        disabled={clocking}
+                    >
+                        <Clock size={20} />
+                        <span>{clocking ? 'Processing...' : (isClockedIn ? 'Stop Personal Shift' : 'Start Personal Shift')}</span>
+                    </button>
+                </div>
             </header>
 
             <section className="stats-grid">
@@ -88,6 +156,20 @@ export default function AdminDashboard() {
             </div>
 
             <style jsx>{`
+        .flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .items-start { align-items: flex-start; }
+        
+        .clock-btn {
+          display: flex; align-items: center; gap: 0.75rem; 
+          padding: 0.85rem 1.5rem; border-radius: 1rem; font-weight: 700;
+          transition: all 0.2s;
+        }
+        .clock-btn.in { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .clock-btn.out { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .clock-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .clock-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
         .dashboard-header { margin-bottom: 2rem; }
         .dashboard-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
         .dashboard-header p { color: var(--text-muted); }
