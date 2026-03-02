@@ -4,7 +4,7 @@ import { Employee, TimeLog } from '@/lib/models/models';
 
 export async function POST(req: Request) {
     try {
-        const { employeeId, email, action, location } = await req.json();
+        const { employeeId, email, action, location, remote } = await req.json();
 
         if ((!employeeId && !email) || !action) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -42,6 +42,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: `Welcome ${employee.name}`, name: employee.name });
 
         } else if (action === 'out') {
+
             const activeLog = await TimeLog.findOne({
                 employeeId: employee._id,
                 status: 'active'
@@ -49,6 +50,19 @@ export async function POST(req: Request) {
 
             if (!activeLog) {
                 return NextResponse.json({ error: 'Not clocked in' }, { status: 400 });
+            }
+
+            if (remote) {
+                activeLog.status = 'pending_approval';
+                activeLog.isRemote = true;
+                activeLog.remoteLocation = location || { address: 'REMOTE_MOBILE' };
+                activeLog.requestedAt = new Date();
+                await activeLog.save();
+                return NextResponse.json({
+                    message: 'Remote clock-off request sent for approval',
+                    name: employee.name,
+                    pending: true
+                });
             }
 
             activeLog.clockOut = new Date();

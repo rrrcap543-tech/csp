@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const rawBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-const baseUrl = rawBaseUrl.endsWith('/') ? rawBaseUrl.slice(0, -1) : rawBaseUrl;
+const baseUrl = rawBaseUrl.replace(/\/+$/, '');
 
 export async function sendMail({ to, subject, html }: { to: string; subject: string; html: string }) {
     try {
@@ -78,7 +78,7 @@ export async function sendPasswordResetEmail(email: string, name: string, token:
 }
 
 export async function sendRosterPublishedEmail(email: string, name: string, weekStart: string) {
-    const loginLink = `${baseUrl}/login`;
+    const loginLink = `${baseUrl}/`;
 
     return sendMail({
         to: email,

@@ -29,6 +29,9 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
+        // Save user session
+        localStorage.setItem('user', JSON.stringify(data));
+
         if (activeTab === 'kiosk') {
           router.push('/kiosk');
         } else if (activeTab === 'staff') {

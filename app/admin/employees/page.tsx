@@ -47,11 +47,18 @@ export default function EmployeesPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const isEditing = !!newEmp._id;
+
+        // Clean up data before sending
+        const payload = { ...newEmp };
+        if (!payload.username) delete payload.username;
+        if (!payload.email) delete payload.email;
+        if (isEditing) payload.id = newEmp._id;
+
         try {
             const res = await fetch('/api/employees', {
                 method: isEditing ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(isEditing ? { ...newEmp, id: newEmp._id } : newEmp)
+                body: JSON.stringify(payload)
             });
             const data = await res.json();
 

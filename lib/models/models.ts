@@ -31,10 +31,19 @@ const TimeLogSchema = new Schema({
         coordinates: [Number],
         address: String
     },
-    status: { type: String, enum: ['active', 'completed'], default: 'active' },
+    isRemote: { type: Boolean, default: false },
+    remoteLocation: {
+        type: { type: String, default: 'Point' },
+        coordinates: [Number],
+        address: String
+    },
+    status: { type: String, enum: ['active', 'completed', 'pending_approval', 'denied'], default: 'active' },
     isPaid: { type: Boolean, default: false },
     remarks: { type: String },
     hoursWorked: { type: Number, default: 0 },
+    requestedAt: { type: Date },
+    approvedBy: { type: Schema.Types.ObjectId, ref: 'Employee' },
+    approvedAt: { type: Date },
 });
 
 // Calculate hours worked before saving if clockOut is present

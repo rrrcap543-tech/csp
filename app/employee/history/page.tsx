@@ -3,25 +3,39 @@
 import React, { useState, useEffect } from 'react';
 import { History, Calendar, Clock, ArrowRight, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 export default function EmployeeHistory() {
     const [email, setEmail] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [logs, setLogs] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        const savedUserStr = localStorage.getItem('user');
+        if (savedUserStr) {
+            const savedUser = JSON.parse(savedUserStr);
+            if (savedUser.email) {
+                setEmail(savedUser.email);
+                setIsAuthenticated(true);
+                fetchHistoryForEmail(savedUser.email);
+            }
+        }
+    }, []);
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
         if (email) {
             setIsAuthenticated(true);
-            fetchHistory();
+            fetchHistoryForEmail(email);
         }
     };
 
-    const fetchHistory = async () => {
+    const fetchHistoryForEmail = async (userEmail: string) => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/logs?email=${email}`);
+            const res = await fetch(`/api/logs?email=${userEmail}`);
             const data = await res.json();
             if (Array.isArray(data)) setLogs(data);
         } catch (err) {
@@ -72,7 +86,7 @@ export default function EmployeeHistory() {
         <div className="history-container gradient-bg">
             <div className="history-content">
                 <header className="history-header">
-                    <button className="back-btn" onClick={() => setIsAuthenticated(false)}>
+                    <button className="back-btn" onClick={() => router.push('/staff')}>
                         <ArrowLeft size={18} />
                         <span>Back</span>
                     </button>

@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { LogOut, MapPin, ShieldCheck, ShieldAlert, Loader2 } from 'lucide-react';
+import { LogOut, MapPin, ShieldCheck, ShieldAlert, Loader2, ArrowLeft } from 'lucide-react';
 import { getGeolocation } from '@/lib/utils/geo';
+import { useRouter } from 'next/navigation';
 
 export default function RemoteClockOff() {
     const [loading, setLoading] = useState(false);
@@ -11,6 +12,18 @@ export default function RemoteClockOff() {
     const [status, setStatus] = useState<any>(null);
     const [email, setEmail] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        const savedUserStr = localStorage.getItem('user');
+        if (savedUserStr) {
+            const savedUser = JSON.parse(savedUserStr);
+            if (savedUser.email) {
+                setEmail(savedUser.email);
+                setIsAuthenticated(true);
+            }
+        }
+    }, []);
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -94,9 +107,12 @@ export default function RemoteClockOff() {
     return (
         <div className="remote-container gradient-bg">
             <div className="clock-off-card glass">
-                <header>
+                <header className="remote-header">
+                    <button className="back-btn" onClick={() => router.push('/staff')}>
+                        <ArrowLeft size={18} />
+                    </button>
                     <div className="user-profile">
-                        <div className="avatar">{email[0].toUpperCase()}</div>
+                        <div className="avatar">{email[0]?.toUpperCase()}</div>
                         <div className="user-text">
                             <span className="email">{email}</span>
                             <span className="status">Active Shift</span>
@@ -146,9 +162,13 @@ export default function RemoteClockOff() {
 
             <style jsx>{`
                 .remote-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; color: var(--foreground); }
-                .clock-off-card { width: 100%; max-width: 450px; padding: 2.5rem; border-radius: 3rem; text-align: center; background: white; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.06); }
+                .clock-off-card { width: 100%; max-width: 450px; padding: 2.5rem; border-radius: 3rem; text-align: center; background: white; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.06); position: relative; }
                 
-                .user-profile { background: #f1f5f9; padding: 1.25rem; border-radius: 1.75rem; display: flex; align-items: center; gap: 1rem; text-align: left; margin-bottom: 2.5rem; }
+                .remote-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 2.5rem; position: relative; }
+                .back-btn { position: absolute; left: 0; top: 0; background: #fff; border: 1px solid var(--border); width: 40px; height: 40px; border-radius: 12px; color: var(--text-muted); display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+                .back-btn:hover { color: var(--foreground); border-color: var(--text-muted); transform: translateX(-3px); }
+
+                .user-profile { background: #f1f5f9; padding: 1.25rem; border-radius: 1.75rem; display: flex; align-items: center; gap: 1rem; text-align: left; width: 100%; }
                 .avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--secondary); color: #854d0e; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
                 .email { display: block; font-weight: 700; font-size: 1rem; color: var(--foreground); }
                 .status { font-size: 0.75rem; color: #16a34a; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }

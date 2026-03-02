@@ -8,28 +8,35 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import StaffSchedule from './StaffSchedule';
+import { getGeolocation } from '@/lib/utils/geo';
 
 export default function StaffPortalClient() {
     const [user, setUser] = useState<any>(null);
     const [logs, setLogs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isClockingOut, setIsClockingOut] = useState(false);
+    const [clockError, setClockError] = useState<string | null>(null);
     const router = useRouter();
 
     useEffect(() => {
-        // In a real app, fetch from session
-        const mockEmail = 'employee@caprinos.co.uk';
-        fetchStaffData(mockEmail);
+        // Load user from storage
+        const savedUserStr = localStorage.getItem('user');
+        if (savedUserStr) {
+            const savedUser = JSON.parse(savedUserStr);
+            setUser(savedUser);
+            fetchStaffData(savedUser.email);
+        } else {
+            router.push('/');
+        }
     }, []);
 
     const fetchStaffData = async (email: string) => {
+        if (!email) return;
         try {
             const res = await fetch(`/api/logs?email=${email}`);
             const data = await res.json();
             if (Array.isArray(data)) {
                 setLogs(data);
-                if (data[0] && data[0].employeeId) {
-                    setUser(data[0].employeeId);
-                }
             }
         } catch (err) {
             console.error(err);
@@ -41,9 +48,46 @@ export default function StaffPortalClient() {
     const activeShift = logs.find(log => log.status === 'active');
     const weeklyHours = logs.reduce((acc, log) => acc + (log.hoursWorked || 0), 0).toFixed(1);
 
+    const handleQuickClockOff = async () => {
+        if (!user?.email) return;
+        setIsClockingOut(true);
+        setClockError(null);
+
+        try {
+            const pos = await getGeolocation();
+            const res = await fetch('/api/clock', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: user.email,
+                    action: 'out',
+                    remote: true,
+                    location: {
+                        coordinates: [pos.coords.longitude, pos.coords.latitude],
+                        address: 'REMOTE_DASHBOARD'
+                    }
+                })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                alert('Request Sent: Your clock-off is awaiting admin approval.');
+                fetchStaffData(user.email);
+            } else {
+                setClockError(data.error || 'Failed to clock off');
+            }
+        } catch (err: any) {
+            setClockError('Location access required to clock off remotely.');
+        } finally {
+            setIsClockingOut(false);
+        }
+    };
+
     const handleLogout = () => {
         localStorage.removeItem('user');
         sessionStorage.clear();
+        setUser(null);
+        setLogs([]);
         router.push('/');
     };
 
@@ -55,8 +99,8 @@ export default function StaffPortalClient() {
                     <div className="user-profile">
                         <div className="avatar">{user?.name?.[0] || 'U'}</div>
                         <div className="user-text">
-                            <h1>Welcome, {user?.name || 'Staff Member'}</h1>
-                            <p>Northampton UK Branch • {format(new Date(), 'EEEE, MMM do')}</p>
+                            <h1>Hi {user?.name?.split(' ')[0] || 'Staff Member'}!</h1>
+                            <p>Northampton Branch • {format(new Date(), 'EEEE, MMM do')}</p>
                         </div>
                     </div>
                     <button className="logout-action-btn" onClick={handleLogout} aria-label="Log out">
@@ -78,27 +122,32 @@ export default function StaffPortalClient() {
                                     ? `Shift started at ${format(new Date(activeShift.clockIn), 'HH:mm')}`
                                     : 'Ready for your next shift?'}
                             </span>
+                            {clockError && <p className="error-tip">{clockError}</p>}
                         </div>
                     </div>
                     {activeShift && (
-                        <button className="clock-off-quick" onClick={() => router.push('/clock-off')}>
-                            Clock Out
+                        <button
+                            className="clock-off-quick"
+                            onClick={handleQuickClockOff}
+                            disabled={isClockingOut}
+                        >
+                            {isClockingOut ? 'Clocking Out...' : 'Clock Out'}
                         </button>
                     )}
                 </section>
 
-                <StaffSchedule employeeId={user?._id} />
+                <StaffSchedule employeeId={user?.id} />
 
                 {/* Dash Grid */}
                 <div className="dash-grid">
                     <div className="summary-card glass">
                         <div className="card-header">
                             <TrendingUp size={20} className="icon-gold" />
-                            <h3>Weekly Summary</h3>
+                            <h3>Activity Summary</h3>
                         </div>
                         <div className="stats-row">
                             <div className="stat">
-                                <span className="label">Total Hours</span>
+                                <span className="label">Logged Hours</span>
                                 <span className="value">{weeklyHours}h</span>
                             </div>
                             <div className="stat">
@@ -114,9 +163,13 @@ export default function StaffPortalClient() {
                             <span>Shift History</span>
                             <ChevronRight size={18} className="chevron" />
                         </button>
-                        <button className="action-tile glass" onClick={() => router.push('/clock-off')}>
+                        <button
+                            className="action-tile glass"
+                            onClick={activeShift ? handleQuickClockOff : () => router.push('/clock-off')}
+                            disabled={isClockingOut}
+                        >
                             <div className="action-icon remote"><MapPin size={24} /></div>
-                            <span>Remote Clock Off</span>
+                            <span>{isClockingOut ? 'Capturing GPS...' : 'Remote Clock Off'}</span>
                             <ChevronRight size={18} className="chevron" />
                         </button>
                     </div>
@@ -138,8 +191,10 @@ export default function StaffPortalClient() {
                                     {format(new Date(log.clockIn), 'HH:mm')} - {log.clockOut ? format(new Date(log.clockOut), 'HH:mm') : 'Active'}
                                 </div>
                                 <div className="log-hours">{log.hoursWorked || '--'}h</div>
-                                <div className={`log-badge ${log.isPaid ? 'paid' : 'pending'}`}>
-                                    {log.isPaid ? 'PAID' : 'PENDING'}
+                                <div className={`log-badge ${log.status}`}>
+                                    {log.status === 'pending_approval' ? 'Awaiting Approval' :
+                                        log.status === 'denied' ? 'Rejected' :
+                                            log.isPaid ? 'PAID' : 'PENDING'}
                                 </div>
                             </div>
                         ))}
@@ -171,7 +226,10 @@ export default function StaffPortalClient() {
         .status-icon { width: 50px; height: 50px; border-radius: 50%; background: #f8fafc; display: flex; align-items: center; justify-content: center; color: var(--secondary); border: 2px solid #f1f5f9; }
         .status-label { display: block; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; }
         .status-value { font-size: 1.1rem; font-weight: 700; margin-top: 2px; color: var(--foreground); }
-        .clock-off-quick { background: var(--primary); color: white; padding: 0.85rem 1.5rem; border-radius: 1.25rem; font-weight: 800; font-size: 0.9rem; }
+        .clock-off-quick { background: var(--primary); color: white; padding: 0.85rem 1.5rem; border-radius: 1.25rem; font-weight: 800; font-size: 0.9rem; transition: all 0.2s; }
+        .clock-off-quick:hover:not(:disabled) { background: var(--primary-hover); transform: scale(1.05); }
+        .clock-off-quick:disabled { background: #cbd5e1; cursor: not-allowed; opacity: 0.8; }
+        .error-tip { color: #dc2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.5rem; }
 
         .dash-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
         .summary-card { padding: 2rem; border-radius: 2.25rem; background: white; border: 1px solid var(--border); }
@@ -203,6 +261,9 @@ export default function StaffPortalClient() {
         .log-hours { font-weight: 800; color: var(--foreground); width: 60px; text-align: right; }
         .log-badge { font-size: 0.7rem; font-weight: 950; padding: 0.25rem 0.65rem; border-radius: 8px; }
         .log-badge.paid { background: #dcfce7; color: #166534; }
+        .log-badge.pending_approval { background: #fffbeb; color: #92400e; }
+        .log-badge.denied { background: #fef2f2; color: #dc2626; }
+        .log-badge.completed { background: #f1f5f9; color: #475569; }
         .log-badge.pending { background: #f1f5f9; color: #475569; }
 
         .staff-footer { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-top: 1rem; font-weight: 600; }
@@ -225,6 +286,6 @@ export default function StaffPortalClient() {
           .stats-row { gap: 2rem; justify-content: space-between; }
         }
       `}</style>
-        </main>
+        </main >
     );
 }

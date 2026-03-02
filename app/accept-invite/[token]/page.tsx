@@ -66,7 +66,7 @@ function AcceptInviteForm() {
 
             if (res.ok) {
                 setSuccess(true);
-                setTimeout(() => router.push('/'), 3000);
+                setTimeout(() => router.push('/'), 10000);
             } else {
                 const data = await res.json();
                 setError(data.error || 'Failed to activate account');

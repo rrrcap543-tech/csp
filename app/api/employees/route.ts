@@ -16,6 +16,11 @@ export async function GET() {
 export async function POST(req: Request) {
     try {
         const body = await req.json();
+
+        // Sanitize unique sparse fields - convert empty strings to undefined
+        if (body.username === '') delete body.username;
+        if (body.email === '') delete body.email;
+
         await connectDB();
 
         const query: any = { $or: [{ employeeId: body.employeeId }] };
@@ -29,7 +34,7 @@ export async function POST(req: Request) {
         }
 
         const isKiosk = body.role === 'kiosk';
-        const inviteToken = isKiosk ? null : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const inviteToken = isKiosk ? undefined : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
         const newEmployee = new Employee({
             ...body,
@@ -60,10 +65,16 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
     try {
         const { id, ...data } = await req.json();
+
+        // Sanitize unique sparse fields - convert empty strings to undefined
+        if (data.username === '') data.username = undefined;
+        if (data.email === '') data.email = undefined;
+
         await connectDB();
         const updated = await Employee.findByIdAndUpdate(id, data, { new: true });
         return NextResponse.json(updated);
     } catch (error) {
+        console.error('Update employee error:', error);
         return NextResponse.json({ error: 'Failed to update employee' }, { status: 500 });
     }
 }

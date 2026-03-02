@@ -20,7 +20,9 @@ export async function GET() {
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
         const weeklyLogs = await TimeLog.find({ clockIn: { $gte: sevenDaysAgo } });
         const totalHours = weeklyLogs.reduce((acc, log) => acc + (log.hoursWorked || 0), 0);
-        const pendingPayroll = weeklyLogs.filter(l => !l.isPaid).length;
+
+        // Count all unpaid completed logs
+        const pendingPayroll = await TimeLog.countDocuments({ status: 'completed', isPaid: false });
 
         return NextResponse.json({
             activeStaff,
@@ -29,8 +31,10 @@ export async function GET() {
             pendingPayroll,
             recentActivity: recentLogs.map(l => ({
                 name: l.employeeId?.name || 'Unknown',
-                action: l.status === 'active' ? 'Clocked In' : 'Clocked Out',
-                time: l.clockIn.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                action: l.status === 'active' ? 'Clocked In' :
+                    l.status === 'pending_approval' ? 'Requested Remote Out' :
+                        l.status === 'denied' ? 'Remote Out Denied' : 'Clocked Out',
+                time: (l.status === 'pending_approval' ? l.requestedAt : (l.clockOut || l.clockIn)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 id: l.employeeId?.employeeId || '---',
                 status: l.status
             }))

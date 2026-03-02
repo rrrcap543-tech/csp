@@ -7,11 +7,12 @@ export async function GET(req: Request) {
         const { searchParams } = new URL(req.url);
         const employeeId = searchParams.get('employeeId');
         const email = searchParams.get('email');
-        const week = searchParams.get('week');
+        const status = searchParams.get('status');
 
         await connectDB();
 
         let query: any = {};
+        if (status) query.status = status;
         if (employeeId) {
             query.employeeId = employeeId;
         } else if (email) {

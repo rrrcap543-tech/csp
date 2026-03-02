@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Users, Calendar, Banknote, LogOut, Settings, Pizza } from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, Banknote, LogOut, Settings, Pizza, MapPin } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
 export default function AdminSidebar() {
@@ -13,6 +13,7 @@ export default function AdminSidebar() {
     { name: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
     { name: 'Employees', icon: Users, href: '/admin/employees' },
     { name: 'Schedule', icon: Calendar, href: '/admin/schedule' },
+    { name: 'Requests', icon: MapPin, href: '/admin/remote-requests' },
     { name: 'Payroll', icon: Banknote, href: '/admin/payroll' },
   ];
 

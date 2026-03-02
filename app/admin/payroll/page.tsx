@@ -16,7 +16,7 @@ export default function PayrollPage() {
     const fetchLogs = async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/logs');
+            const res = await fetch('/api/logs?status=completed');
             const data = await res.json();
             if (Array.isArray(data)) setLogs(data);
         } catch (err) {
