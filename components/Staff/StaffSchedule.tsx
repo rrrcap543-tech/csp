@@ -18,7 +18,7 @@ export default function StaffSchedule({ employeeId }: { employeeId: string }) {
     const fetchMySchedule = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/schedule?weekStart=${weekStart.toISOString()}`);
+            const res = await fetch(`/api/schedule?weekStart=${format(weekStart, 'yyyy-MM-dd')}`);
             const data = await res.json();
             // Filter for only this employee's published shifts
             setShifts(data.filter((s: any) => s.employeeId?._id === employeeId && s.status === 'published'));

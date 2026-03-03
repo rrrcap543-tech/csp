@@ -48,15 +48,19 @@ export default function AdminDashboard() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    employeeId: admin.employeeId, // Assuming employeeId is stored in user object
                     email: admin.email,
                     action: isClockedIn ? 'out' : 'in',
                     location: { address: 'ADMIN_DASHBOARD' }
                 })
             });
             if (res.ok) {
+                // Immediate toggle for snappiness
                 setIsClockedIn(!isClockedIn);
-                fetchData();
+                // Then verify and refresh
+                setTimeout(() => {
+                    checkClockStatus(admin.id);
+                    fetchData();
+                }, 800);
             } else {
                 const err = await res.json();
                 alert(err.error || 'Clock failed');
@@ -80,7 +84,7 @@ export default function AdminDashboard() {
     return (
         <div className="dashboard-content">
             <header className="dashboard-header">
-                <div className="flex justify-between items-start">
+                <div className="header-top">
                     <div>
                         <h1>Dashboard Overview</h1>
                         <p>Welcome back, {admin?.name || 'Admin'}. Here's what's happening today at Northampton.</p>
@@ -96,6 +100,7 @@ export default function AdminDashboard() {
                 </div>
             </header>
 
+
             <section className="stats-grid">
                 {stats.map((stat) => (
                     <div key={stat.title} className="stat-card glass">
@@ -106,7 +111,7 @@ export default function AdminDashboard() {
                             <button className="icon-btn"><MoreVertical size={20} /></button>
                         </div>
                         <div className="stat-body">
-                            <h3>{stat.value}</h3>
+                            <h3>{data ? stat.value : '...'}</h3>
                             <p className="stat-title">{stat.title}</p>
                         </div>
                         <div className="stat-footer">
@@ -125,12 +130,12 @@ export default function AdminDashboard() {
                     <div className="activity-items">
                         {recentActivity.map((item: any, i: number) => (
                             <div key={i} className="activity-item">
-                                <div className="avatar-placeholder">{item.name[0]}</div>
+                                <div className="avatar-placeholder">{item.name?.[0] || '?'}</div>
                                 <div className="activity-details">
                                     <span className="name">{item.name} <span className="id">({item.id})</span></span>
                                     <span className="action">{item.action} at <span className="time">{item.time}</span></span>
                                 </div>
-                                <div className="status-dot"></div>
+                                <div className={`status-dot ${item.status === 'active' ? 'active' : ''}`}></div>
                             </div>
                         ))}
                     </div>
@@ -170,46 +175,50 @@ export default function AdminDashboard() {
         .clock-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .clock-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .dashboard-header { margin-bottom: 2rem; }
-        .dashboard-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
-        .dashboard-header p { color: var(--text-muted); }
+        .dashboard-header { margin-bottom: 2.5rem; }
+        .dashboard-header h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 0.5rem; }
+        .dashboard-header p { color: var(--text-muted); font-size: 1.1rem; }
+
+        .header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
 
         .stats-grid { 
           display: grid; 
-          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+          grid-template-columns: repeat(4, 1fr); 
           gap: 1.5rem; 
-          margin-bottom: 2rem;
+          margin-bottom: 2.5rem;
         }
-        .stat-card { padding: 1.5rem; border-radius: 1.5rem; }
-        .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-        .stat-body h3 { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
-        .stat-title { color: var(--text-muted); font-size: 0.9rem; }
-        .stat-footer { margin-top: 1rem; font-size: 0.85rem; color: #22c55e; }
+
+        @media (max-width: 1200px) {
+          .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+          .dashboard-header h1 { font-size: 1.75rem; }
+          .dashboard-header p { font-size: 0.95rem; }
+          .header-top { flex-direction: column; align-items: stretch; }
+          .clock-btn { width: 100%; justify-content: center; }
+          .stats-grid { grid-template-columns: 1fr; gap: 1rem; }
+          .dashboard-grid { grid-template-columns: 1fr !important; }
+        }
+
+        .stat-card { padding: 1.5rem; border-radius: 1.5rem; transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .stat-body h3 { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.25rem; letter-spacing: -0.5px; }
+        .stat-title { color: var(--text-muted); font-size: 0.95rem; font-weight: 600; }
+        .stat-footer { margin-top: 1.25rem; font-size: 0.85rem; font-weight: 700; color: #16a34a; display: flex; align-items: center; gap: 0.5rem; }
 
         .dashboard-grid { 
           display: grid; 
-          grid-template-columns: 1fr 400px; 
-          gap: 1.5rem; 
+          grid-template-columns: 1fr 420px; 
+          gap: 2rem; 
         }
 
-        @media (max-width: 1280px) {
-          .dashboard-grid {
-            grid-template-columns: 1fr;
-          }
+        @media (max-width: 1100px) {
+          .dashboard-grid { grid-template-columns: 1fr; }
         }
 
-        @media (max-width: 640px) {
-          .dashboard-header h1 {
-            font-size: 1.5rem;
-          }
-          .stats-grid {
-            grid-template-columns: 1fr;
-          }
-          .activity-list {
-            padding: 1rem;
-          }
-        }
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
         .activity-list { padding: 2rem; border-radius: 2rem; }
         .activity-items { display: flex; flex-direction: column; gap: 1rem; }

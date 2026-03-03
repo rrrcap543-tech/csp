@@ -168,7 +168,7 @@ export default function AdminSidebar() {
         @media (max-width: 1024px) {
           .admin-sidebar {
             width: 80px;
-            padding: 1.5rem 0.75rem;
+            padding: 1.5rem 0.5rem;
           }
           .logo-name, .nav-item span {
             display: none;
@@ -176,10 +176,12 @@ export default function AdminSidebar() {
           .nav-item {
             justify-content: center;
             padding: 1rem;
+            border-radius: 12px;
           }
           .sidebar-header {
             display: flex;
             justify-content: center;
+            margin-bottom: 2rem;
           }
         }
 
@@ -188,6 +190,9 @@ export default function AdminSidebar() {
             display: flex;
             padding: 0 1.25rem;
             height: 64px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
           }
           .admin-sidebar {
             width: 100%;
@@ -196,9 +201,12 @@ export default function AdminSidebar() {
             top: auto;
             bottom: 0;
             padding: 0;
-            background: white;
-            border-top: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(0,0,0,0.05);
             justify-content: center;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.04);
+            z-index: 1000;
           }
           .sidebar-header, .sidebar-footer {
             display: none;
@@ -209,14 +217,15 @@ export default function AdminSidebar() {
             height: 100%;
             justify-content: space-evenly;
             gap: 0;
-            padding: 0 0.5rem;
+            padding: 0;
           }
           .nav-item {
             flex: 1;
             flex-direction: column;
-            gap: 0.35rem;
-            padding: 0.75rem 0;
-            font-size: 0.65rem;
+            gap: 4px;
+            padding: 0.5rem 0;
+            font-size: 0.6rem;
+            height: 100%;
             border-radius: 0;
             background: transparent !important;
             box-shadow: none !important;
@@ -224,32 +233,29 @@ export default function AdminSidebar() {
             justify-content: center;
             align-items: center;
             position: relative;
-            transition: color 0.3s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: none !important;
           }
           .nav-item.active {
             color: var(--primary);
           }
-          .nav-item.active::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 3px;
-            background: var(--primary);
-            border-radius: 0 0 4px 4px;
+          .nav-item.active :global(svg) {
+            transform: translateY(-2px);
+            color: var(--primary);
+          }
+          .nav-item.active span {
+            font-weight: 800;
+            transform: scale(1.05);
           }
           .nav-item span {
             display: block;
-            font-weight: 800;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.2px;
-          }
-          .nav-item :global(svg) {
-            transform: translateY(2px);
+            letter-spacing: 0.5px;
+            font-size: 0.55rem;
           }
         }
+
       `}</style>
     </>
   );

@@ -37,7 +37,7 @@ export default function AdminSchedule() {
         try {
             const [empRes, shiftRes] = await Promise.all([
                 fetch('/api/employees'),
-                fetch(`/api/schedule?weekStart=${weekStart.toISOString()}`)
+                fetch(`/api/schedule?weekStart=${format(weekStart, 'yyyy-MM-dd')}`)
             ]);
             const empData = await empRes.json();
             const shiftData = await shiftRes.json();
@@ -88,8 +88,8 @@ export default function AdminSchedule() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    sourceWeekStart: prevWeek.toISOString(),
-                    targetWeekStart: weekStart.toISOString()
+                    sourceWeekStart: format(prevWeek, 'yyyy-MM-dd'),
+                    targetWeekStart: format(weekStart, 'yyyy-MM-dd')
                 })
             });
             const data = await res.json();
@@ -110,7 +110,7 @@ export default function AdminSchedule() {
             const res = await fetch('/api/schedule/publish', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ weekStart: weekStart.toISOString() })
+                body: JSON.stringify({ weekStart: format(weekStart, 'yyyy-MM-dd') })
             });
             if (res.ok) {
                 alert('Rota published successfully!');
@@ -136,7 +136,7 @@ export default function AdminSchedule() {
     const openEditModal = (shift: any) => {
         setSelectedShift(shift);
         setModalData({
-            employeeId: shift.employeeId._id,
+            employeeId: shift.employeeId?._id || '',
             date: format(new Date(shift.date), 'yyyy-MM-dd'),
             startTime: shift.startTime,
             endTime: shift.endTime,
@@ -206,7 +206,7 @@ export default function AdminSchedule() {
                             </div>
                             {days.map(day => {
                                 const dayShifts = shifts.filter(s =>
-                                    s.employeeId._id === emp._id &&
+                                    s.employeeId?._id === emp._id &&
                                     isSameDay(new Date(s.date), day)
                                 );
 
@@ -339,71 +339,120 @@ export default function AdminSchedule() {
         .dot.draft { background: #94a3b8; }
         .dot.published { background: #16a34a; }
 
-        .schedule-container { border-radius: 2rem; overflow: hidden; background: white; }
+        .schedule-container { 
+            border-radius: 2rem; 
+            overflow: auto; 
+            background: white; 
+            max-height: 70vh;
+            border: 1px solid var(--border);
+            position: relative;
+        }
         .schedule-grid {
             display: grid;
-            grid-template-columns: 240px repeat(7, 1fr);
-            border-bottom: 1px solid var(--border);
+            grid-template-columns: 240px repeat(7, 180px);
+            min-width: max-content;
         }
 
-        .grid-corner { padding: 1.5rem; background: #f8fafc; font-weight: 800; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); color: var(--text-muted); }
-        .grid-header { padding: 1.5rem; display: flex; flex-direction: column; align-items: center; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: #f8fafc; }
+        .grid-corner { 
+            padding: 1.5rem; 
+            background: #f8fafc; 
+            font-weight: 800; 
+            border-right: 2px solid var(--border); 
+            border-bottom: 2px solid var(--border); 
+            color: var(--text-muted);
+            position: sticky;
+            left: 0;
+            top: 0;
+            z-index: 20;
+        }
+        .grid-header { 
+            padding: 1.25rem; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            border-right: 1px solid var(--border); 
+            border-bottom: 2px solid var(--border); 
+            background: #f8fafc; 
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
         .grid-header.today { background: #fef2f2; color: var(--primary); }
-        .day-name { font-size: 0.75rem; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
-        .day-date { font-size: 1.1rem; font-weight: 800; }
+        .grid-header.today::after {
+            content: 'TODAY';
+            font-size: 0.6rem;
+            font-weight: 900;
+            margin-top: 4px;
+            background: var(--primary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
 
-        .emp-sidebar { padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-        .avatar-small { width: 32px; height: 32px; border-radius: 10px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; }
-        .emp-name-stack { display: flex; flex-direction: column; }
-        .emp-name-stack .name { font-weight: 700; font-size: 0.95rem; }
-        .emp-name-stack .role { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: capitalize; }
+        .emp-sidebar { 
+            padding: 1.25rem 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+            border-right: 2px solid var(--border); 
+            border-bottom: 1px solid var(--border); 
+            background: white;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
 
-        .grid-cell { padding: 0.5rem; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); min-height: 100px; display: flex; flex-direction: column; gap: 0.5rem; background: #fff; }
+        .grid-cell { 
+            padding: 0.75rem; 
+            border-right: 1px solid var(--border); 
+            border-bottom: 1px solid var(--border); 
+            min-height: 120px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.75rem; 
+            background: #fff; 
+            transition: background 0.2s;
+        }
+        .grid-cell:hover { background: #fdfdfd; }
         .grid-cell:hover .add-shift-btn { opacity: 1; }
 
-        .shift-card { 
-            padding: 0.75rem; border-radius: 1rem; font-size: 0.8rem; cursor: pointer; transition: 0.2s;
-            border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .shift-card:hover { transform: scale(1.02); }
-        .shift-card.draft { background: #f1f5f9; border-left: 4px solid #94a3b8; color: #475569; }
-        .shift-card.published { background: #f0fdf4; border-left: 4px solid #16a34a; color: #166534; }
-        .shift-time { font-weight: 800; }
-        .shift-role { font-size: 0.75rem; opacity: 0.8; margin-top: 2px; }
-
-        .add-shift-btn {
-            width: 100%; padding: 0.5rem; border-radius: 0.75rem; background: #f8fafc; color: var(--text-muted);
-            border: 1px dashed var(--border); opacity: 0; transition: 0.2s;
-        }
-
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 100; }
-        .modal-content { width: 450px; padding: 2.5rem; border-radius: 2.5rem; background: white; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        .modal-header h2 { font-weight: 800; }
-        .close-btn { background: none; color: var(--text-muted); }
-
-        .form-group { margin-bottom: 1.25rem; }
-        .form-group label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; }
-        input, select { width: 100%; padding: 0.85rem; border-radius: 1rem; border: 1px solid var(--border); font-family: inherit; font-size: 1rem; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .modal-footer { margin-top: 2rem; display: flex; align-items: center; gap: 1rem; }
-
-        @media (max-width: 1280px) {
-            .grid-corner { width: 150px; }
-            .emp-sidebar { width: 150px; }
-            .schedule-grid { grid-template-columns: 150px repeat(7, 120px); }
-            .schedule-container { overflow-x: auto; margin: 0 -1rem; border-radius: 0; }
+        @media (max-width: 1024px) {
+            .schedule-grid {
+                grid-template-columns: 200px repeat(7, 160px);
+            }
+            .grid-corner, .emp-sidebar { width: 200px; }
         }
 
         @media (max-width: 768px) {
-            .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-            .header-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-            .header-actions button { padding: 0.75rem 0.5rem; font-size: 0.8rem; justify-content: center; }
-            .calendar-controls { flex-direction: column; gap: 1rem; padding: 1.25rem 1rem; }
-            .week-nav { width: 100%; justify-content: space-between; gap: 0.5rem; }
-            .current-week { font-size: 0.95rem; }
-            .modal-content { width: 95%; max-width: 450px; padding: 1.5rem; border-radius: 2rem; }
+            .page-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+            .header-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+            .header-actions button { padding: 0.85rem 0.5rem; font-size: 0.85rem; justify-content: center; width: 100%; }
+            .calendar-controls { flex-direction: column; gap: 1.25rem; padding: 1.5rem 1rem; }
+            .week-nav { width: 100%; justify-content: space-between; }
+            .current-week { font-size: 1rem; }
+            
+            .schedule-container { 
+                margin: 0 -1.25rem; 
+                border-radius: 0; 
+                border-left: none; 
+                border-right: none;
+                max-height: none;
+            }
+            .schedule-grid {
+                grid-template-columns: 120px repeat(7, 140px);
+            }
+            .grid-corner, .emp-sidebar { width: 120px; padding: 1rem; }
+            .emp-name-stack .role { display: none; }
+            .avatar-small { display: none; }
+            
+            .modal-content { 
+                width: 95%; 
+                max-width: 450px; 
+                padding: 1.75rem; 
+                border-radius: 2rem; 
+            }
         }
+
       `}</style>
         </div>
     );

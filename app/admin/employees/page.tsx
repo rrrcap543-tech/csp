@@ -157,7 +157,7 @@ export default function EmployeesPage() {
                             <tr><td colSpan={6} style={{ textAlign: 'center', padding: '3rem' }}>No records found. Create your first entry!</td></tr>
                         ) : employees.map((emp) => (
                             <tr key={emp._id}>
-                                <td>
+                                <td data-label="Name / Device">
                                     <div className="name-cell">
                                         <div className={`avatar ${emp.role === 'kiosk' ? 'kiosk-av' : ''}`}>
                                             {emp.role === 'kiosk' ? <Monitor size={14} /> : emp.name[0]}
@@ -165,20 +165,20 @@ export default function EmployeesPage() {
                                         <span>{emp.name}</span>
                                     </div>
                                 </td>
-                                <td className="mono">{emp.employeeId}</td>
-                                <td className="email-cell">{emp.role === 'kiosk' ? `User: ${emp.username}` : emp.email}</td>
-                                <td>
+                                <td data-label="ID / PIN" className="mono">{emp.employeeId}</td>
+                                <td data-label="Access" className="email-cell">{emp.role === 'kiosk' ? `User: ${emp.username}` : emp.email}</td>
+                                <td data-label="Status">
                                     <span className={`status-badge ${emp.inviteStatus}`}>
                                         {emp.inviteStatus || 'accepted'}
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Role">
                                     <span className={`role-badge ${emp.role}`}>
                                         {emp.role === 'admin' ? <Shield size={14} /> : emp.role === 'kiosk' ? <Monitor size={14} /> : <User size={14} />}
                                         {emp.role}
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Actions">
                                     <div className="actions">
                                         {emp.inviteStatus === 'pending' && (
                                             <button className="icon-btn resend" title="Resend Invitation Email" onClick={() => handleResend(emp._id)}>
@@ -388,18 +388,55 @@ export default function EmployeesPage() {
         .copy-btn { padding: 0.5rem; background: white; border-radius: 0.5rem; color: var(--text-muted); border: 1px solid var(--border); }
         .done-btn { width: 100%; background: #0f172a; color: white; padding: 1rem; border-radius: 1rem; font-weight: 700; }
 
+        @media (max-width: 1024px) {
+          .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+          th, td { white-space: nowrap; padding: 1rem; }
+        }
+
         @media (max-width: 768px) {
-          .page-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
-          .add-btn { width: 100%; justify-content: center; }
-          .table-container { 
-            overflow-x: auto; 
-            margin: 0 -1rem; 
-            border-radius: 0; 
+          .page-header { flex-direction: column; align-items: stretch; gap: 1.5rem; }
+          .add-btn { width: 100%; justify-content: center; padding: 1rem; }
+          .title-area h1 { font-size: 1.75rem; }
+          
+          .table-container { background: transparent; border: none; overflow: visible; }
+          table thead { display: none; }
+          table, tbody, tr, td { display: block; width: 100%; }
+          
+          tr { 
+            background: white; 
+            margin-bottom: 1.25rem; 
+            padding: 1.5rem; 
+            border-radius: 2rem; 
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
           }
-          th, td { padding: 1rem; white-space: nowrap; }
-          .modal-content { padding: 2rem 1.25rem; border-radius: 2rem; }
+          
+          td { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0.85rem 0; 
+            border-bottom: 1px solid #f1f5f9;
+            white-space: normal;
+          }
+          td:last-child { border-bottom: none; padding-bottom: 0; margin-top: 1rem; }
+          
+          td::before {
+            content: attr(data-label);
+            font-weight: 800;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+          }
+          
+          .actions { width: 100%; justify-content: flex-end; }
+          .icon-btn { flex: 1; height: 48px; max-width: 60px; }
+          
+          .modal-content { padding: 2rem 1.25rem; width: 95%; max-width: 500px; border-radius: 2.5rem; }
           .form-row { grid-template-columns: 1fr; gap: 0; }
         }
+
       `}</style>
         </div>
     );

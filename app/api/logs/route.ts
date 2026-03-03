@@ -8,11 +8,17 @@ export async function GET(req: Request) {
         const employeeId = searchParams.get('employeeId');
         const email = searchParams.get('email');
         const status = searchParams.get('status');
+        const start = searchParams.get('start');
+        const end = searchParams.get('end');
 
         await connectDB();
 
         let query: any = {};
         if (status) query.status = status;
+        if (start && end) {
+            query.clockIn = { $gte: new Date(start), $lte: new Date(end) };
+        }
+
         if (employeeId) {
             query.employeeId = employeeId;
         } else if (email) {

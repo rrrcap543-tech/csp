@@ -129,7 +129,7 @@ export default function RemoteRequestsPage() {
                 .page-header h1 { font-size: 2rem; font-weight: 800; color: var(--foreground); margin-bottom: 0.5rem; }
                 .page-header p { color: var(--text-muted); font-weight: 500; }
 
-                .requests-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem; }
+                .requests-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
                 
                 .loading, .empty { grid-column: 1 / -1; padding: 5rem 2rem; text-align: center; border-radius: 2rem; border: 2px dashed var(--border); }
                 .icon-empty { color: #10b981; margin-bottom: 1.5rem; }
@@ -164,7 +164,7 @@ export default function RemoteRequestsPage() {
                 .approve-btn { height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--primary); color: white; font-weight: 800; }
                 .approve-btn:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(212, 18, 23, 0.2); }
 
-                @media (max-width: 640px) {
+                @media (max-width: 768px) {
                     .requests-grid { grid-template-columns: 1fr; }
                     .request-card { padding: 1.5rem; }
                 }
