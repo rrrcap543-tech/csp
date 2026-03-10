@@ -44,6 +44,7 @@ const TimeLogSchema = new Schema({
     requestedAt: { type: Date },
     approvedBy: { type: Schema.Types.ObjectId, ref: 'Employee' },
     approvedAt: { type: Date },
+    adminComment: { type: String },
 });
 
 // Calculate hours worked before saving if clockOut is present

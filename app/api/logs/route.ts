@@ -22,7 +22,7 @@ export async function GET(req: Request) {
         if (employeeId) {
             query.employeeId = employeeId;
         } else if (email) {
-            const emp = await Employee.findOne({ email });
+            const emp = await Employee.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
             if (emp) query.employeeId = emp._id;
             else return NextResponse.json([]);
         }

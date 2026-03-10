@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Check, X, MapPin, Clock, User, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { Check, X, MapPin, Clock, User, ShieldAlert, ShieldCheck, Map } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function RemoteRequestsPage() {
     const [requests, setRequests] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [admin, setAdmin] = useState<any>(null);
+    const [comments, setComments] = useState<{ [key: string]: string }>({});
 
     useEffect(() => {
         const savedUserStr = localStorage.getItem('user');
@@ -33,14 +34,20 @@ export default function RemoteRequestsPage() {
         if (!confirm(`Are you sure you want to ${action} this request?`)) return;
 
         try {
+            const comment = comments[id] || '';
             const res = await fetch('/api/admin/remote-requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, action, adminId: admin?.id })
+                body: JSON.stringify({ id, action, adminId: admin?._id || admin?.id, comment })
             });
 
             if (res.ok) {
                 fetchRequests();
+                setComments(prev => {
+                    const newComments = { ...prev };
+                    delete newComments[id];
+                    return newComments;
+                });
                 alert(`Request ${action}d successfully`);
             } else {
                 const data = await res.json();
@@ -102,11 +109,31 @@ export default function RemoteRequestsPage() {
                                     <MapPin size={14} className="icon-loc" />
                                     <span>{req.remoteLocation?.address || 'GPS Coordinates Provided'}</span>
                                     <br />
-                                    <small className="coords">
-                                        {req.remoteLocation?.coordinates?.[0].toFixed(5)}, {req.remoteLocation?.coordinates?.[1].toFixed(5)}
-                                    </small>
+                                    {req.remoteLocation?.coordinates?.length >= 2 && (
+                                        <div className="coords-wrapper">
+                                            <a
+                                                href={`https://maps.google.com/?q=${req.remoteLocation.coordinates[1]},${req.remoteLocation.coordinates[0]}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="coords-link"
+                                            >
+                                                <Map size={14} className="icon-map" />
+                                                View on Map ({req.remoteLocation.coordinates[0].toFixed(5)}, {req.remoteLocation.coordinates[1].toFixed(5)})
+                                            </a>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="comment-section">
+                            <textarea
+                                placeholder="Add a comment (optional)..."
+                                value={comments[req._id] || ''}
+                                onChange={(e) => setComments({ ...comments, [req._id]: e.target.value })}
+                                className="comment-input"
+                                rows={2}
+                            />
                         </div>
 
                         <div className="card-actions">
@@ -159,14 +186,25 @@ export default function RemoteRequestsPage() {
                 .coords { color: var(--text-muted); font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; }
 
                 .card-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; }
-                .deny-btn { height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #fef2f2; color: #dc2626; font-weight: 700; }
+                .deny-btn { height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #fef2f2; color: #dc2626; font-weight: 700; border: none; cursor: pointer; transition: all 0.2s; }
                 .deny-btn:hover { background: #fee2e2; }
-                .approve-btn { height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--primary); color: white; font-weight: 800; }
+                .approve-btn { height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--primary); color: white; font-weight: 800; border: none; cursor: pointer; transition: all 0.2s; }
                 .approve-btn:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(212, 18, 23, 0.2); }
+
+                .comment-section { margin-bottom: 1.5rem; padding: 0 1.5rem; }
+                .comment-input { width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: #f8fafc; font-family: inherit; font-size: 0.9rem; resize: none; color: var(--foreground); transition: border-color 0.2s, box-shadow 0.2s; }
+                .comment-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(212, 18, 23, 0.1); }
+                .comment-input::placeholder { color: var(--text-muted); }
+
+                .coords-wrapper { margin-top: 0.5rem; }
+                .coords-link { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 600; color: #1d4ed8; text-decoration: none; padding: 0.4rem 0.8rem; background: #eff6ff; border-radius: 8px; transition: all 0.2s; font-family: 'JetBrains Mono', monospace; }
+                .coords-link:hover { background: #dbeafe; transform: translateY(-1px); }
+                .icon-map { color: #2563eb; }
 
                 @media (max-width: 768px) {
                     .requests-grid { grid-template-columns: 1fr; }
-                    .request-card { padding: 1.5rem; }
+                    .request-card { padding: 1.5rem 0; }
+                    .card-top, .shift-details, .comment-section, .card-actions { padding-left: 1.5rem; padding-right: 1.5rem; }
                 }
             `}</style>
         </div>

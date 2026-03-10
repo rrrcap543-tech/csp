@@ -16,7 +16,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
     try {
-        const { id, action, adminId } = await req.json();
+        const { id, action, adminId, comment } = await req.json();
         await connectDB();
 
         const log = await TimeLog.findById(id);
@@ -28,14 +28,16 @@ export async function POST(req: Request) {
             log.status = 'completed';
             log.clockOut = log.requestedAt || new Date(); // Use actual request time
             log.locationOut = log.remoteLocation;
-            log.approvedBy = adminId;
+            if (adminId) log.approvedBy = adminId;
             log.approvedAt = new Date();
+            if (comment) log.adminComment = comment;
             await log.save();
             return NextResponse.json({ message: 'Request approved' });
         } else if (action === 'deny') {
             log.status = 'denied';
-            log.approvedBy = adminId;
+            if (adminId) log.approvedBy = adminId;
             log.approvedAt = new Date();
+            if (comment) log.adminComment = comment;
             await log.save();
             return NextResponse.json({ message: 'Request denied' });
         }

@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
         const employee = employeeId
             ? await Employee.findOne({ employeeId })
-            : await Employee.findOne({ email });
+            : await Employee.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
 
         if (!employee) {
             return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
@@ -49,6 +49,19 @@ export async function POST(req: Request) {
             });
 
             if (!activeLog) {
+                // Check if they already have one pending
+                const pendingLog = await TimeLog.findOne({
+                    employeeId: employee._id,
+                    status: 'pending_approval'
+                });
+
+                if (pendingLog) {
+                    return NextResponse.json({
+                        error: 'You already have a remote clock-out request awaiting approval.',
+                        pending: true
+                    }, { status: 400 });
+                }
+
                 return NextResponse.json({ error: 'Not clocked in' }, { status: 400 });
             }
 

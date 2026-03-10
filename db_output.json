@@ -1,0 +1,262 @@
+[
+  {
+    "_id": "69a8874486734c2ff8853bfb",
+    "employeeId": "69a614ea1f60d29115602fc0",
+    "clockIn": "2026-03-04T19:25:56.758Z",
+    "locationIn": {
+      "address": "ADMIN_DASHBOARD",
+      "type": "Point",
+      "coordinates": []
+    },
+    "locationOut": {
+      "type": "Point",
+      "coordinates": []
+    },
+    "isRemote": false,
+    "remoteLocation": {
+      "type": "Point",
+      "coordinates": []
+    },
+    "status": "active",
+    "isPaid": false,
+    "hoursWorked": 0,
+    "__v": 0
+  },
+  {
+    "_id": "69a88643917a81c3a6cab2d5",
+    "employeeId": "69a87d22755e7dff8966d169",
+    "clockIn": "2026-03-04T19:21:39.861Z",
+    "locationIn": {
+      "address": "STORE_KIOSK",
+      "type": "Point",
+      "coordinates": []
+    },
+    "locationOut": {
+      "type": "Point",
+      "coordinates": []
+    },
+    "isRemote": true,
+    "remoteLocation": {
+      "coordinates": [
+        -0.9007763273337515,
+        52.237121191123855
+      ],
+      "address": "REMOTE_MOBILE"
+    },
+    "status": "pending_approval",
+    "isPaid": false,
+    "hoursWorked": 0,
+    "__v": 0,
+    "requestedAt": "2026-03-04T19:21:46.500Z"
+  },
+  {
+    "_id": "69a8850486734c2ff8853be8",
+    "employeeId": "69a87d22755e7dff8966d169",
+    "clockIn": "2026-03-04T19:16:20.617Z",
+    "locationIn": {
+      "address": "STORE_KIOSK",
+      "type": "Point",
+      "coordinates": []
+    },
+    "locationOut": {
+      "type": "Point",
+      "coordinates": []
+    },
+    "isRemote": true,
+    "remoteLocation": {
+      "coordinates": [
+        -0.9007763273337515,
+        52.237121191123855
+      ],
+      "address": "REMOTE_DASHBOARD"
+    },
+    "status": "pending_approval",
+    "isPaid": false,
+    "hoursWorked": 0,
+    "__v": 0,
+    "requestedAt": "2026-03-04T19:21:02.286Z"
+  },
+  {
+    "_id": "69a8843386734c2ff8853bdc",
+    "employeeId": "69a87d22755e7dff8966d169",
+    "clockIn": "2026-03-04T19:12:51.086Z",
+    "locationIn": {
+      "address": "STORE_KIOSK",
+      "type": "Point",
+      "coordinates": []
+    },
+    "locationOut": {
+      "address": "STORE_KIOSK"
+    },
+    "isRemote": false,
+    "remoteLocation": {
+      "type": "Point",
+      "coordinates": []
+    },
+    "status": "completed",
+    "isPaid": false,
+    "hoursWorked": 0.05,
+    "__v": 0,
+    "clockOut": "2026-03-04T19:16:08.819Z"
+  },
+  {
+    "_id": "69a87e34755e7dff8966d181",
+    "employeeId": "69a614ea1f60d29115602fc0",
+    "clockIn": "2026-03-04T18:47:16.160Z",
+    "locationIn": {
+      "address": "ADMIN_DASHBOARD",
+      "type": "Point",
+      "coordinates": []
+    },
+    "locationOut": {
+      "address": "ADMIN_DASHBOARD"
+    },
+    "isRemote": false,
+    "remoteLocation": {
+      "type": "Point",
+      "coordinates": []
+    },
+    "status": "completed",
+    "isPaid": false,
+    "hoursWorked": 0,
+    "__v": 0,
+    "clockOut": "2026-03-04T18:47:17.127Z"
+  },
+  {
+    "_id": "69a87d7f46583bd1d9cb36ae",
+    "employeeId": "69a87d22755e7dff8966d169",
+    "clockIn": "2026-03-04T18:44:15.951Z",
+    "locationIn": {
+      "address": "STORE_KIOSK",
+      "type": "Point",
+      "coordinates": []
+    },
+    "locationOut": {
+      "type": "Point",
+      "coordinates": []
+    },
+    "isRemote": true,
+    "remoteLocation": {
+      "coordinates": [
+        -0.9008952740282277,
+        52.23720343638047
+      ],
+      "address": "REMOTE_DASHBOARD"
+    },
+    "status": "pending_approval",
+    "isPaid": false,
+    "hoursWorked": 0,
+    "__v": 0,
+    "requestedAt": "2026-03-04T18:49:29.495Z"
+  },
+  {
+    "_id": "69a763e8f470ee7437f5c782",
+    "employeeId": "69a614ea1f60d29115602fc0",
+    "clockIn": "2026-03-03T22:42:48.132Z",
+    "locationIn": {
+      "address": "ADMIN_DASHBOARD",
+      "type": "Point",
+      "coordinates": []
+    },
+    "locationOut": {
+      "address": "STORE_KIOSK"
+    },
+    "isRemote": false,
+    "remoteLocation": {
+      "type": "Point",
+      "coordinates": []
+    },
+    "status": "completed",
+    "isPaid": false,
+    "hoursWorked": 20.03,
+    "__v": 0,
+    "clockOut": "2026-03-04T18:44:31.610Z"
+  },
+  {
+    "_id": "69a763b1f470ee7437f5c76b",
+    "employeeId": "69a614ea1f60d29115602fc0",
+    "clockIn": "2026-03-03T22:41:53.413Z",
+    "locationIn": {
+      "address": "STORE_KIOSK",
+      "type": "Point",
+      "coordinates": []
+    },
+    "locationOut": {
+      "address": "ADMIN_DASHBOARD"
+    },
+    "isRemote": false,
+    "remoteLocation": {
+      "type": "Point",
+      "coordinates": []
+    },
+    "status": "completed",
+    "isPaid": false,
+    "hoursWorked": 0.01,
+    "__v": 0,
+    "clockOut": "2026-03-03T22:42:32.181Z"
+  },
+  {
+    "_id": "69a6149a1f60d29115602fa4",
+    "employeeId": "69a607b2395ae744fb79896a",
+    "clockIn": "2026-03-02T22:52:10.204Z",
+    "locationIn": {
+      "address": "ADMIN_DASHBOARD",
+      "type": "Point",
+      "coordinates": []
+    },
+    "locationOut": {
+      "address": "ADMIN_DASHBOARD"
+    },
+    "isRemote": false,
+    "remoteLocation": {
+      "type": "Point",
+      "coordinates": []
+    },
+    "status": "completed",
+    "isPaid": true,
+    "hoursWorked": 0,
+    "__v": 0,
+    "clockOut": "2026-03-02T22:52:20.599Z"
+  },
+  {
+    "_id": "69a60c038b04dce140b4d88d",
+    "employeeId": "69a607b2395ae744fb79896a",
+    "clockIn": "2026-03-02T22:15:31.732Z",
+    "locationIn": {
+      "address": "STORE_KIOSK",
+      "type": "Point",
+      "coordinates": []
+    },
+    "locationOut": {
+      "coordinates": [
+        -1.022342823051629,
+        52.18039528094667
+      ],
+      "address": "REMOTE_MOBILE"
+    },
+    "status": "completed",
+    "isPaid": true,
+    "hoursWorked": 0.1,
+    "__v": 0,
+    "clockOut": "2026-03-02T22:21:22.460Z"
+  },
+  {
+    "_id": "699e145e14e712e3df787f4f",
+    "employeeId": "699e131f14e712e3df787f45",
+    "clockIn": "2026-02-24T21:13:02.062Z",
+    "locationIn": {
+      "address": "STORE_KIOSK",
+      "type": "Point",
+      "coordinates": []
+    },
+    "locationOut": {
+      "address": "STORE_KIOSK"
+    },
+    "status": "completed",
+    "isPaid": true,
+    "hoursWorked": 0.02,
+    "__v": 0,
+    "clockOut": "2026-02-24T21:13:57.417Z",
+    "remarks": "Paid for 5 days"
+  }
+]
