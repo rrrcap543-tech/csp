@@ -26,7 +26,11 @@ export async function GET(request: Request) {
             commonQuery.storeId = storeIdParam;
         }
 
-        const activeStaff = await TimeLog.countDocuments({ ...commonQuery, status: 'active' });
+        const activeStaffList = await TimeLog.find({ ...commonQuery, status: 'active' })
+            .populate('employeeId', 'name employeeId')
+            .lean();
+        const activeStaff = activeStaffList.length;
+
         const totalEmployees = await Employee.countDocuments(commonQuery); // Assuming Employee also has storeId
 
         // Recent activity
@@ -44,11 +48,17 @@ export async function GET(request: Request) {
 
         return NextResponse.json({
             activeStaff,
+            activeStaffList: activeStaffList.map(l => ({
+                name: (l.employeeId as any)?.name || 'Unknown Staff',
+                id: (l.employeeId as any)?.employeeId || '---',
+                clockIn: l.clockIn,
+                isRemote: l.isRemote
+            })),
             totalEmployees,
             totalHours: Math.round(totalHours),
             pendingPayroll,
             recentActivity: recentLogs.map(l => {
-                const emp = l.employeeId;
+                const emp = l.employeeId as any;
                 return {
                     name: emp?.name || 'Unknown Staff',
                     action: l.status === 'active' ? 'Clocked In' :

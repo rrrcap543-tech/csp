@@ -124,6 +124,32 @@ export default function AdminDashboard() {
             <div className="dashboard-grid">
                 <section className="activity-list glass">
                     <div className="section-header">
+                        <h2>Currently On Shift</h2>
+                        <div className="badge">{data?.activeStaff || 0} Online</div>
+                    </div>
+                    <div className="activity-items">
+                        {data?.activeStaffList?.length > 0 ? (
+                            data.activeStaffList.map((item: any, i: number) => (
+                                <div key={i} className="activity-item">
+                                    <div className="avatar-placeholder">{item.name?.[0] || '?'}</div>
+                                    <div className="activity-details">
+                                        <span className="name">{item.name} <span className="id">({item.id})</span></span>
+                                        <span className="action">
+                                            Clocked in at <span className="time">{new Date(item.clockIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                            {item.isRemote && <span className="remote-badge">Remote</span>}
+                                        </span>
+                                    </div>
+                                    <div className="status-dot active"></div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="empty-state">No staff currently on shift</div>
+                        )}
+                    </div>
+                </section>
+
+                <section className="activity-list glass">
+                    <div className="section-header">
                         <h2>Recent Activity</h2>
                         <button className="text-btn">View All</button>
                     </div>
@@ -211,8 +237,12 @@ export default function AdminDashboard() {
 
         .dashboard-grid { 
           display: grid; 
-          grid-template-columns: 1fr 420px; 
+          grid-template-columns: repeat(3, 1fr); 
           gap: 2rem; 
+        }
+
+        @media (max-width: 1400px) {
+          .dashboard-grid { grid-template-columns: 1fr 1fr; }
         }
 
         @media (max-width: 1100px) {
@@ -247,6 +277,10 @@ export default function AdminDashboard() {
         .chart-dummy { flex: 1; display: flex; align-items: flex-end; gap: 1rem; height: 200px; margin-bottom: 1rem; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
         .bar { flex: 1; background: linear-gradient(to top, var(--primary), var(--secondary)); border-radius: 8px 8px 0 0; min-height: 10px; }
         .chart-labels { display: flex; justify-content: space-between; padding: 0 10px; color: var(--text-muted); font-size: 0.8rem; }
+        
+        .badge { background: #dcfce7; color: #166534; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; }
+        .remote-badge { background: #fee2e2; color: #991b1b; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; margin-left: 0.5rem; font-weight: 700; text-transform: uppercase; }
+        .empty-state { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.95rem; background: rgba(15, 23, 42, 0.02); border-radius: 1rem; border: 1px dashed var(--border); }
 
         .icon-btn, .text-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; }
         .text-btn { color: var(--primary); font-weight: 600; }
