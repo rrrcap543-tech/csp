@@ -27,6 +27,23 @@ export default function KioskClient() {
     setPin(prev => prev.slice(0, -1));
   };
 
+  // Handle physical keyboard input
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key >= '0' && e.key <= '9') {
+        handleKeyPress(e.key);
+      } else if (e.key === 'Backspace') {
+        handleBackspace();
+      } else if (e.key === 'Escape') {
+        handleClear();
+      } else if (e.key === 'Enter') {
+        if (pin.length > 0) handleClockIn();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [pin]); 
+
   const handleClockIn = async () => {
     if (!pin) return;
     try {
@@ -99,7 +116,15 @@ export default function KioskClient() {
         </div>
 
         {/* Input Section */}
-        <div className="input-section glass">
+        <div className="input-section glass" onClick={() => document.getElementById('kiosk-pin-input')?.focus()}>
+          <input
+            id="kiosk-pin-input"
+            type="text"
+            inputMode="none"
+            autoFocus
+            style={{ position: 'absolute', opacity: 0, height: 0, width: 0, zIndex: -1 }}
+            readOnly
+          />
           <div className="pin-display">
             {Array(6).fill(0).map((_, i) => (
               <div key={i} className={`pin-dot ${pin.length > i ? 'active' : ''}`}>

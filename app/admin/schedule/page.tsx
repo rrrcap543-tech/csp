@@ -198,11 +198,7 @@ export default function AdminSchedule() {
                     {employees.map(emp => (
                         <React.Fragment key={emp._id}>
                             <div className="emp-sidebar">
-                                <div className="avatar-small">{emp.name[0]}</div>
-                                <div className="emp-name-stack">
-                                    <span className="name">{emp.name}</span>
-                                    <span className="role">{emp.role}</span>
-                                </div>
+                                <span className="name">{emp.name}</span>
                             </div>
                             {days.map(day => {
                                 const dayShifts = shifts.filter(s =>
@@ -314,143 +310,203 @@ export default function AdminSchedule() {
             )}
 
             <style jsx>{`
-        .schedule-page { padding: 1rem; }
+        .schedule-page { padding: 1.5rem; max-width: 1400px; margin: 0 auto; }
         .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; }
-        .page-header h1 { font-size: 2.25rem; font-weight: 800; }
-        .page-header p { color: var(--text-muted); }
+        .page-header h1 { font-size: 2.25rem; font-weight: 800; color: #1a1a1a; letter-spacing: -0.02em; }
+        .page-header p { color: #64748b; font-size: 1rem; margin-top: 0.25rem; }
         .header-actions { display: flex; gap: 1rem; }
 
         .primary-btn, .secondary-btn, .cancel-btn, .delete-btn {
             display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1.5rem; border-radius: 1rem; font-weight: 700; font-size: 0.9rem;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
         }
-        .primary-btn { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(212, 18, 23, 0.15); }
-        .secondary-btn { background: white; border: 1px solid var(--border); color: var(--foreground); }
-        .cancel-btn { color: var(--text-muted); }
-        .delete-btn { color: var(--destructive); background: #fef2f2; }
+        .primary-btn { background: #d41217; color: white; border: none; box-shadow: 0 4px 12px rgba(212, 18, 23, 0.15); }
+        .primary-btn:hover { background: #b90e12; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(212, 18, 23, 0.2); }
+        .secondary-btn { background: white; border: 1px solid #e2e8f0; color: #1e293b; }
+        .secondary-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .cancel-btn { color: #64748b; background: transparent; border: none; }
+        .cancel-btn:hover { color: #1e293b; }
+        .delete-btn { color: #dc2626; background: #fef2f2; border: 1px solid #fee2e2; }
+        .delete-btn:hover { background: #fee2e2; border-color: #fecaca; }
         .flex-spacer { flex: 1; }
 
-        .calendar-controls { padding: 1.25rem 2rem; border-radius: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .week-nav { display: flex; align-items: center; gap: 1.5rem; }
-        .current-week { display: flex; align-items: center; gap: 1rem; font-size: 1.1rem; font-weight: 800; color: var(--foreground); }
-        .icon-red { color: var(--primary); }
-        .legend { display: flex; gap: 1.5rem; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); }
-        .legend-item { display: flex; align-items: center; gap: 0.5rem; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .calendar-controls { 
+            padding: 1rem 2rem; 
+            border-radius: 1.5rem; 
+            margin-bottom: 1.5rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+        }
+        .week-nav { display: flex; align-items: center; gap: 1rem; }
+        .current-week { display: flex; align-items: center; gap: 0.75rem; font-size: 1.05rem; font-weight: 700; color: #1e293b; }
+        .icon-btn { 
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; 
+            border-radius: 50%; border: 1px solid #e2e8f0; background: white; color: #64748b;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover { background: #f8fafc; color: #1e293b; border-color: #cbd5e1; }
+        .icon-red { color: #d41217; }
+        
+        .legend { display: flex; gap: 1.25rem; font-size: 0.8rem; font-weight: 600; color: #64748b; }
+        .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
         .dot.draft { background: #94a3b8; }
         .dot.published { background: #16a34a; }
 
         .schedule-container { 
-            border-radius: 2rem; 
+            border-radius: 1.5rem; 
             overflow: auto; 
             background: white; 
-            max-height: 70vh;
-            border: 1px solid var(--border);
+            max-height: calc(100vh - 350px);
+            border: 1px solid #e2e8f0;
             position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
         }
         .schedule-grid {
             display: grid;
-            grid-template-columns: 240px repeat(7, 180px);
-            min-width: max-content;
+            grid-template-columns: 200px repeat(7, 1fr);
+            min-width: 1200px;
         }
 
         .grid-corner { 
-            padding: 1.5rem; 
+            padding: 1.25rem; 
             background: #f8fafc; 
-            font-weight: 800; 
-            border-right: 2px solid var(--border); 
-            border-bottom: 2px solid var(--border); 
-            color: var(--text-muted);
+            font-weight: 700; 
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-right: 1px solid #e2e8f0; 
+            border-bottom: 2px solid #e2e8f0; 
+            color: #64748b;
             position: sticky;
             left: 0;
             top: 0;
             z-index: 20;
         }
         .grid-header { 
-            padding: 1.25rem; 
+            padding: 1rem; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            border-right: 1px solid var(--border); 
-            border-bottom: 2px solid var(--border); 
+            border-right: 1px solid #e2e8f0; 
+            border-bottom: 2px solid #e2e8f0; 
             background: #f8fafc; 
             position: sticky;
             top: 0;
             z-index: 10;
         }
-        .grid-header.today { background: #fef2f2; color: var(--primary); }
-        .grid-header.today::after {
-            content: 'TODAY';
-            font-size: 0.6rem;
-            font-weight: 900;
-            margin-top: 4px;
-            background: var(--primary);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
+        .day-name { font-weight: 800; font-size: 0.9rem; color: #1e293b; }
+        .day-date { font-size: 0.75rem; color: #64748b; font-weight: 500; }
+        
+        .grid-header.today { background: #fff1f2; }
+        .grid-header.today .day-name { color: #d41217; }
+        .grid-header.today .day-date { color: #e11d48; }
 
         .emp-sidebar { 
             padding: 1.25rem 1.5rem; 
             display: flex; 
             align-items: center; 
-            gap: 1rem; 
-            border-right: 2px solid var(--border); 
-            border-bottom: 1px solid var(--border); 
             background: white;
+            border-right: 1px solid #e2e8f0; 
+            border-bottom: 1px solid #e2e8f0; 
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.95rem;
             position: sticky;
             left: 0;
             z-index: 5;
         }
 
         .grid-cell { 
-            padding: 0.75rem; 
-            border-right: 1px solid var(--border); 
-            border-bottom: 1px solid var(--border); 
-            min-height: 120px; 
+            padding: 0.6rem; 
+            border-right: 1px solid #f1f5f9; 
+            border-bottom: 1px solid #f1f5f9; 
+            min-height: 100px; 
             display: flex; 
             flex-direction: column; 
-            gap: 0.75rem; 
+            gap: 0.5rem; 
             background: #fff; 
             transition: background 0.2s;
+            position: relative;
         }
-        .grid-cell:hover { background: #fdfdfd; }
+        .grid-cell:hover { background: #fbfcfe; }
+        
+        .shift-card {
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .shift-card:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+        
+        .shift-card.draft { 
+            background: #f1f5f9; color: #475569; border-color: #e2e8f0;
+            border-left: 4px solid #94a3b8;
+        }
+        .shift-card.published { 
+            background: #f0fdf4; color: #166534; border-color: #dcfce7;
+            border-left: 4px solid #22c55e;
+        }
+        
+        .shift-time { font-weight: 800; margin-bottom: 0.25rem; }
+        .shift-role { font-weight: 500; opacity: 0.8; font-size: 0.75rem; }
+
+        .add-shift-btn { 
+            opacity: 0; border: none; background: #f1f5f9; color: #64748b; 
+            border-radius: 6px; padding: 4px; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; cursor: pointer; width: 24px; height: 24px;
+            position: absolute; bottom: 8px; right: 8px;
+        }
         .grid-cell:hover .add-shift-btn { opacity: 1; }
+        .add-shift-btn:hover { background: #e2e8f0; color: #1e293b; }
+
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); 
+            backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal-content { 
+            width: 90%; max-width: 500px; padding: 2rem; border-radius: 1.5rem; background: white;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-header h2 { font-size: 1.5rem; font-weight: 800; color: #0f172a; }
+        .close-btn { background: none; border: none; color: #64748b; cursor: pointer; padding: 4px; }
+        
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 0.5rem; }
+        .form-group select, .form-group input { 
+            width: 100%; padding: 0.75rem 1rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; 
+            font-size: 0.95rem; color: #1e293b; transition: all 0.2s;
+        }
+        .form-group select:focus, .form-group input:focus { border-color: #d41217; outline: none; box-shadow: 0 0 0 3px rgba(212, 18, 23, 0.1); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
         @media (max-width: 1024px) {
-            .schedule-grid {
-                grid-template-columns: 200px repeat(7, 160px);
-            }
-            .grid-corner, .emp-sidebar { width: 200px; }
+            .schedule-page { padding: 1rem; }
+            .schedule-grid { grid-template-columns: 140px repeat(7, 160px); }
         }
 
         @media (max-width: 768px) {
-            .page-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
-            .header-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-            .header-actions button { padding: 0.85rem 0.5rem; font-size: 0.85rem; justify-content: center; width: 100%; }
-            .calendar-controls { flex-direction: column; gap: 1.25rem; padding: 1.5rem 1rem; }
+            .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .header-actions { width: 100%; }
+            .header-actions button { flex: 1; padding: 0.6rem; font-size: 0.8rem; }
+            .calendar-controls { flex-direction: column; gap: 1rem; padding: 1rem; }
             .week-nav { width: 100%; justify-content: space-between; }
-            .current-week { font-size: 1rem; }
             
             .schedule-container { 
-                margin: 0 -1.25rem; 
-                border-radius: 0; 
-                border-left: none; 
-                border-right: none;
-                max-height: none;
+                margin: 0 -1rem; border-radius: 0; border-left: none; border-right: none;
+                max-height: calc(100vh - 250px);
             }
-            .schedule-grid {
-                grid-template-columns: 120px repeat(7, 140px);
-            }
-            .grid-corner, .emp-sidebar { width: 120px; padding: 1rem; }
-            .emp-name-stack .role { display: none; }
-            .avatar-small { display: none; }
-            
-            .modal-content { 
-                width: 95%; 
-                max-width: 450px; 
-                padding: 1.75rem; 
-                border-radius: 2rem; 
-            }
+            .schedule-grid { grid-template-columns: 100px repeat(7, 140px); }
+            .grid-corner, .emp-sidebar { width: 100px; padding: 0.75rem 0.5rem; font-size: 0.8rem; }
         }
 
       `}</style>
